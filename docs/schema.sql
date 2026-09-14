@@ -1,0 +1,4 @@
+CREATE TABLE products (id TEXT PRIMARY KEY, barcode TEXT UNIQUE, brand TEXT, name TEXT, normalized_name TEXT, variant TEXT, quantity DECIMAL, unit TEXT, image_url TEXT, category TEXT);
+CREATE TABLE retailers (id TEXT PRIMARY KEY, name TEXT, logo TEXT, website TEXT, data_source TEXT, enabled BOOLEAN);
+CREATE TABLE stores (id TEXT PRIMARY KEY, retailer_id TEXT REFERENCES retailers(id), name TEXT, address TEXT, suburb TEXT, city TEXT, province TEXT, postcode TEXT, latitude DECIMAL, longitude DECIMAL, phone TEXT, opening_hours TEXT);
+CREATE TABLE product_prices (id TEXT PRIMARY KEY, product_id TEXT REFERENCES products(id), retailer_id TEXT REFERENCES retailers(id), store_id TEXT REFERENCES stores(id), price DECIMAL, original_price DECIMAL, promotional_price DECIMAL, loyalty_price DECIMAL, currency TEXT, availability TEXT, product_url TEXT, checked_at TIMESTAMP);
