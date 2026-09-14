@@ -1,0 +1,7 @@
+import { products, locations } from '../database/mock-data.js';
+export function parseQuery(query='') { const norm=query.toLowerCase().replace(/[^a-z0-9.]+/g,' ').trim(); const match=norm.match(/(\d+(?:\.\d+)?)\s*(kg|g|ml|l)\b/); return {normalized:norm,quantity:match?Number(match[1]):null,unit:match?match[2]:null}; }
+function tokens(s){return new Set(s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(Boolean));}
+export function searchProducts(query){const p=parseQuery(query), q=tokens(p.normalized); return products.map(product=>{const text=[product.brand,product.name,...product.aliases].join(' '), t=tokens(text); let score=[...q].filter(x=>t.has(x)).length/Math.max(q.size,1); if(p.quantity!==null){if(p.quantity===product.quantity && p.unit.toLowerCase()===product.unit.toLowerCase())score+=1;else score-=1;} return {product,score};}).filter(x=>x.score>=.25).sort((a,b)=>b.score-a.score).map(x=>x.product);}
+export function getLocation(name){return locations.find(x=>x.name.toLowerCase()===String(name).toLowerCase())||locations[0];}
+export function pricePerUnit(product,amount){const factor=product.unit==='kg'?product.quantity:product.unit==='g'?product.quantity/1000:product.unit==='L'?product.quantity:product.quantity/1000; return amount/factor;}
+export function relativeTime(minutes){return minutes<60?`Price checked ${minutes} minutes ago`:minutes<1440?`Price checked ${Math.round(minutes/60)} hours ago`:'Price may have changed. Last checked 2 days ago.';}
